@@ -2,6 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+import config
 import json
 import dateutil.parser
 import babel
@@ -18,7 +19,7 @@ from forms import *
 
 app = Flask(__name__)
 moment = Moment(app)
-app.config.from_object('config')
+app.config.from_object('config.SQLALCHEMY_DATABASE_URI')
 db = SQLAlchemy(app)
 
 # TODO: connect to a local postgresql database
