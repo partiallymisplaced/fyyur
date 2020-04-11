@@ -30,7 +30,7 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 
 class Venue(db.Model):
-    __tablename__ = 'Venues'
+    __tablename__ = 'venues'
 
     id = db.Column(db.Integer, primary_key=True, unique=True)
     name = db.Column(db.String(120), nullable=False)
@@ -44,9 +44,11 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(500))
+    shows = db.relationship('Show', backref='venue')
+
 
 class Artist(db.Model):
-    __tablename__ = 'Artists'
+    __tablename__ = 'artists'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
@@ -59,8 +61,17 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(500))
+    shows = db.relationship('Show', backref='artist')
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+
+class Show(db.Model):
+  __tablename__ = 'shows'
+
+  id = db.Column(db.Integer, primary_key=True)
+  venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
+  artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
+  start_time = db.Column(db.DateTime)
+
 
 #----------------------------------------------------------------------------#
 # Filters.
