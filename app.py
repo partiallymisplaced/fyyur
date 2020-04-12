@@ -2,6 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+import sys
 import config
 import json
 import dateutil.parser
@@ -95,13 +96,14 @@ app.jinja_env.filters['datetime'] = format_datetime
 def index():
   return render_template('pages/home.html')
 
+# TODO: [02] ------------ VENUE ROUTES ------------
 
 #  Venues
 #  ----------------------------------------------------------------
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
+  # TODO: [02:03] READ AGGREGATE VENUES DATA
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   data=[{
     "city": "San Francisco",
@@ -144,7 +146,7 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
+  # TODO: [02:02] READ VENUE DATA FROM DB
   data1={
     "id": 1,
     "name": "The Musical Hop",
@@ -235,15 +237,53 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  form = VenueForm()
+  errors = False
+  body = {}
 
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
+  try:
+    response = request.form
+    venue = Venue()
+
+  # TODO: clarify why this hack
+    if 'seeking_talent' in response:
+      venue.seeking_venue = True
+    else:
+      venue.seeking_venue = False
+
+    venue.name = response['name']
+    venue.address = response['address']
+    venue.city = response['city']
+    venue.state = response['state']
+    venue.phone = response['phone']
+    venue.genres = response['genres']
+    venue.image_link = response['image_link']
+    venue.website = response['website']
+    venue.facebook_link = response['facebook_link']
+    venue.seeking_description = response['seeking_description']
+
+    db.session.add(venue)
+    db.session.commit()
+
+    body['name'] = venue.name
+
+  except:
+    errors = True
+    db.session.rollback()
+    print(sys.exc_info())
+
+  finally:
+    db.session.close()
+
+  if errors:
+    abort(400)
+
+  else:
+    flash('Venue ' + body['name'] + ' was successfully listed!')
+    return render_template('pages/home.html')
+
   # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -254,11 +294,13 @@ def delete_venue(venue_id):
   # clicking that button delete it from the db then redirect the user to the homepage
   return None
 
+# TODO: [01] ------------ ARTIST ROUTES ------------
+
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
+# TODO: [01:03] READ AGGREGATE ARTISTS DATA
 def artists():
-  # TODO: replace with real data returned from querying the database
   data=[{
     "id": 4,
     "name": "Guns N Petals",
@@ -289,7 +331,7 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
+  # TODO: [01:02] READ ARTIST DATA FROM DB
   data1={
     "id": 4,
     "name": "Guns N Petals",
@@ -428,15 +470,52 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  form = ArtistForm()
+  errors = False
+  body = {}
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
+  try:
+    response = request.form
+    artist = Artist()
+    
+  # TODO: clarify why this hack
+    if 'seeking_venue' in response:
+      artist.seeking_venue = True
+    else:
+      artist.seeking_venue = False
+
+    artist.name = response['name']
+    artist.city = response['city']
+    artist.state = response['state']
+    artist.phone = response['phone']
+    artist.genres = response['genres']
+    artist.image_link = response['image_link']
+    artist.website = response['website']
+    artist.facebook_link = response['facebook_link']
+    artist.seeking_description = response['seeking_description']
+    
+    db.session.add(artist)
+    db.session.commit()
+
+    body['name'] = artist.name
+  
+  except:
+    errors = True
+    db.session.rollback()
+    print(sys.exc_info())
+  
+  finally:
+    db.session.close()
+
+  if errors:
+    abort(400)
+  
+  else:
+    flash('Artist ' + body['name'] + ' was successfully listed!')
+    return render_template('pages/home.html')
+
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
 
 
 #  Shows
@@ -445,7 +524,7 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
   # displays list of shows at /shows
-  # TODO: replace with real venues data.
+  # TODO: replace with real show data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
   data=[{
     "venue_id": 1,
@@ -487,7 +566,6 @@ def shows():
 
 @app.route('/shows/create')
 def create_shows():
-  # renders form. do not touch.
   form = ShowForm()
   return render_template('forms/new_show.html', form=form)
 
