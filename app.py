@@ -140,6 +140,9 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
     venue = Venue.query.get(venue_id)
+    genres = venue.genres.replace('{', '').replace('}', '').replace('\"', '')
+    genres = ''.join(genres).split(",")
+    venue.genres = genres
     return render_template('pages/show_venue.html', venue=venue)
   #TODO: ERR Handle id not in db
 #  Create Venue
@@ -239,6 +242,9 @@ def search_artists():
 def show_artist(artist_id):
   #TODO: ERR Handle id not in db
   artist = Artist.query.get(artist_id)
+  genres = artist.genres.replace('{', '').replace('}', '').replace('\"', '')
+  genres = ''.join(genres).split(",")
+  artist.genres = genres
   return render_template('pages/show_artist.html', artist=artist)
 
 
