@@ -171,7 +171,7 @@ def create_venue_submission():
     venue.city = response['city']
     venue.state = response['state']
     venue.phone = response['phone']
-    venue.genres = response['genres']
+    venue.genres = response.getlist('genres')
     venue.image_link = response['image_link']
     venue.website = response['website']
     venue.facebook_link = response['facebook_link']
@@ -325,7 +325,7 @@ def create_artist_submission():
     artist.city = response['city']
     artist.state = response['state']
     artist.phone = response['phone']
-    artist.genres = response['genres']
+    artist.genres = response.getlist('genres')
     artist.image_link = response['image_link']
     artist.website = response['website']
     artist.facebook_link = response['facebook_link']
