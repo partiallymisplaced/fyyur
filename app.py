@@ -143,6 +143,21 @@ def show_venue(venue_id):
     genres = venue.genres.replace('{', '').replace('}', '').replace('\"', '')
     genres = ''.join(genres).split(",")
     venue.genres = genres
+
+    data = []
+    shows = db.session.query(Show).join(Venue, Show.venue_id == Venue.id).join(Artist, Show.artist_id == Artist.id).all()
+    for show in shows:
+      show = {
+        "id": show.id,
+        "artist_id": show.artist.id,
+        "artist_name": show.artist.name,
+        "artist_image_link": show.artist.image_link,
+        "venue_id": show.venue.id,
+        "venue_name": show.venue.name,
+        "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
+      }
+      data.append(show)
+
     return render_template('pages/show_venue.html', venue=venue)
   #TODO: ERR Handle id not in db
 #  Create Venue
@@ -163,11 +178,10 @@ def create_venue_submission():
     response = request.form
     venue = Venue()
 
-  # TODO: clarify why this hack
     if 'seeking_talent' in response:
-      venue.seeking_venue = True
+      venue.seeking_talent = True
     else:
-      venue.seeking_venue = False
+      venue.seeking_talent = False
 
     venue.name = response['name']
     venue.address = response['address']
