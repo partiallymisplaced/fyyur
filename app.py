@@ -5,6 +5,7 @@
 import sys
 import config
 import json
+import datetime
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify, abort
@@ -144,19 +145,36 @@ def show_venue(venue_id):
     genres = ''.join(genres).split(",")
     venue.genres = genres
 
-    data = []
-    shows = db.session.query(Show).join(Venue, Show.venue_id == Venue.id).join(Artist, Show.artist_id == Artist.id).all()
-    for show in shows:
+    current_time = datetime.utcnow()
+    print(current_time.strftime("%m/%d/%Y, %H:%M"))
+    past_shows = []
+
+    past_shows = db.session.query(Show).filter(Show.start_time >= current_time).join(Venue, Show.venue_id == Venue.id).join(Artist, Show.artist_id == Artist.id).all()
+    for show in past_shows:
       show = {
-        "id": show.id,
-        "artist_id": show.artist.id,
         "artist_name": show.artist.name,
         "artist_image_link": show.artist.image_link,
-        "venue_id": show.venue.id,
-        "venue_name": show.venue.name,
+        "artist_id": show.artist.id,
         "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
       }
-      data.append(show)
+      past_shows.append(show)
+    print("hello", json.dumps(past_shows))
+
+    # TODO: Upcoming shows for venue
+    # venue.upcoming_shows_count
+    # venue.upcoming_shows
+    # show.artist_image_link
+    # show.artist_id
+    # show.artist_name
+    # show.start_time
+
+    # TODO: Past shows for venue
+    # venue.past_shows_count
+    # venue.past_shows
+    # show.artist_image_link
+    # show.artist_id
+    # show.artist_name
+    # show.start_time
 
     return render_template('pages/show_venue.html', venue=venue)
   #TODO: ERR Handle id not in db
@@ -259,6 +277,23 @@ def show_artist(artist_id):
   genres = artist.genres.replace('{', '').replace('}', '').replace('\"', '')
   genres = ''.join(genres).split(",")
   artist.genres = genres
+  # TODO: Upcoming shows for artist
+  # artist.upcoming_shows_count
+  # artist.upcoming_shows
+  # show.venue_image_link
+  # show.venue_id
+  # show.venue_name
+  # show.start_time
+  # TODO: Past shows for artist
+  # artist.past_shows_count
+  # artist.past_shows
+  # artist.upcoming_shows_count
+  # artist.upcoming_shows
+  # show.venue_image_link
+  # show.venue_id
+  # show.venue_name
+  # show.start_time
+
   return render_template('pages/show_artist.html', artist=artist)
 
 
@@ -333,9 +368,7 @@ def create_artist_submission():
 
   try:
     response = request.form
-    artist = Artist()
-    
-  # TODO: clarify why this hack
+    artist = Artist()    
     if 'seeking_venue' in response:
       artist.seeking_venue = True
     else:
