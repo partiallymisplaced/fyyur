@@ -11,3 +11,6 @@ DEBUG = True
 
 # Local database URL (replace with own)
 SQLALCHEMY_DATABASE_URI = 'postgresql://fyyur:fyyur@localhost:5432/fyyur'
+
+# Disables SQLAlchemy Track Modifications deprecation warnings
+SQLALCHEMY_TRACK_MODIFICATIONS = False
