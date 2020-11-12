@@ -48,6 +48,24 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String(500))
     shows = db.relationship('Show', backref='venue')
 
+    def __repr__(self):
+      return f'''
+      -----------------
+      id: {self.id} 
+      name: {self.name} 
+      city: {self.city}
+      state: {self.state}
+      address: {self.address}
+      genres: {self.genres} 
+      phone: {self.phone} 
+      image_link: {self.image_link} 
+      website: {self.website} 
+      facebook_link: {self.facebook_link} 
+      seeking_talent: {self.seeking_talent} 
+      seeking_description: {self.seeking_description} 
+      shows: {self.shows}
+      ----------------- 
+      '''  
 
 class Artist(db.Model):
     __tablename__ = 'artists'
@@ -65,6 +83,23 @@ class Artist(db.Model):
     seeking_description = db.Column(db.String(500))
     shows = db.relationship('Show', backref='artist')
 
+    def __repr__(self):
+      return f'''
+      -----------------
+      id: {self.id} 
+      name: {self.name} 
+      city: {self.city}
+      state: {self.state}
+      phone: {self.phone} 
+      genres: {self.genres} 
+      image_link: {self.image_link} 
+      website: {self.website} 
+      facebook_link: {self.facebook_link} 
+      seeking_venue: {self.seeking_venue} 
+      seeking_description: {self.seeking_description} 
+      shows: {self.shows}
+      ----------------- 
+      '''
 
 class Show(db.Model):
   __tablename__ = 'shows'
@@ -73,7 +108,16 @@ class Show(db.Model):
   venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
   artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
   start_time = db.Column(db.DateTime)
-
+  
+  def __repr__(self):
+      return f'''
+      +++++++++++++++++
+      id: {self.id} 
+      venue_id: {self.venue_id}
+      artist_id: {self.artist_id}
+      start_time: {self.start_time} 
+      +++++++++++++++++ 
+      '''
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -145,20 +189,20 @@ def show_venue(venue_id):
     genres = ''.join(genres).split(",")
     venue.genres = genres
 
-    current_time = datetime.utcnow()
+    current_time = datetime.now()
     print(current_time.strftime("%m/%d/%Y, %H:%M"))
-    past_shows = []
-
-    past_shows = db.session.query(Show).filter(Show.start_time >= current_time).join(Venue, Show.venue_id == Venue.id).join(Artist, Show.artist_id == Artist.id).all()
-    for show in past_shows:
-      show = {
-        "artist_name": show.artist.name,
-        "artist_image_link": show.artist.image_link,
-        "artist_id": show.artist.id,
-        "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
-      }
-      past_shows.append(show)
-    print("hello", json.dumps(past_shows))
+    venue.past_shows = db.session.query(Show).join(Venue, Show.venue_id == Venue.id).join(Artist, Show.artist_id == Artist.id).all()
+    
+    print("hello")
+    
+    # for show in shows:
+    #   show = {
+    #     "artist_name": show.artist.name,
+    #     "artist_image_link": show.artist.image_link,
+    #     "artist_id": show.artist.id,
+    #     "start_time": show.start_time.strftime("%m/%d/%Y, %H:%M")
+    #   }
+    #   past_shows.append(show)
 
     # TODO: Upcoming shows for venue
     # venue.upcoming_shows_count
