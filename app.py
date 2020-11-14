@@ -224,7 +224,6 @@ def show_venue(venue_id):
     venue.upcoming_shows.append(show)
 
     return render_template('pages/show_venue.html', venue=venue)
-  #TODO: ERR Handle id not in db
 
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
@@ -271,14 +270,12 @@ def create_venue_submission():
     db.session.close()
 
   if errors:
-    abort(400)
+    flash('An error occurred. Venue could not be listed.')
+    return render_template('pages/home.html')
 
   else:
     flash('Venue ' + body['name'] + ' was successfully listed!')
     return render_template('pages/home.html')
-
-  # TODO: ERR on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
@@ -320,7 +317,6 @@ def search_artists():
 
 @app.route('/artists/<int:artist_id>') 
 def show_artist(artist_id):
-  #TODO: ERR Handle id not in db
   current_time = datetime.now()
   artist = Artist.query.get(artist_id)
   genres = artist.genres.replace('{', '').replace('}', '').replace('\"', '')
@@ -457,14 +453,13 @@ def create_artist_submission():
     db.session.close()
 
   if errors:
-    abort(400)
+    flash('An error occurred. Artist could not be listed.')
+    return render_template('pages/home.html')
+
   
   else:
     flash('Artist ' + body['name'] + ' was successfully listed!')
     return render_template('pages/home.html')
-
-  # TODO: ERR on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
 
 #  Shows
 #  ----------------------------------------------------------------
@@ -517,15 +512,12 @@ def create_show_submission():
     db.session.close()
 
   if errors:
-    abort(400)
+    flash('An error occurred. Show could not be listed.')
+    return render_template('pages/home.html')
 
   else:
     flash('Show was successfully listed!')
     return render_template('pages/home.html')
-
-  # TODO: ERR on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
 
 @app.errorhandler(404)
 def not_found_error(error):
