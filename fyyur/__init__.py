@@ -179,11 +179,11 @@ def create_venue_submission():
     db.session.close()
 
   if errors:
-    flash('An error occurred. Venue could not be listed.')
+    flash('An error occurred. Venue could not be listed.', 'error')
     return render_template('pages/home.html')
 
   else:
-    flash('Venue ' + body['name'] + ' was successfully listed!')
+    flash('Venue ' + body['name'] + ' was successfully listed!', 'success')
     return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -362,12 +362,12 @@ def create_artist_submission():
     db.session.close()
 
   if errors:
-    flash('An error occurred. Artist could not be listed.')
+    flash('An error occurred. Artist could not be listed.', 'error')
     return render_template('pages/home.html')
 
   
   else:
-    flash('Artist ' + body['name'] + ' was successfully listed!')
+    flash('Artist ' + body['name'] + ' was successfully listed!', 'success')
     return render_template('pages/home.html')
 
 #  Shows
@@ -421,11 +421,11 @@ def create_show_submission():
     db.session.close()
 
   if errors:
-    flash('An error occurred. Show could not be listed.')
+    flash('An error occurred. Show could not be listed.', 'error')
     return render_template('pages/home.html')
 
   else:
-    flash('Show was successfully listed!')
+    flash('Show was successfully listed!', 'success')
     return render_template('pages/home.html')
 
 @app.errorhandler(404)
